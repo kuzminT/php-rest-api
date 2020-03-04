@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AnnouncementController as AnnController;
+//use App\Http\Controllers\AnnouncementController as AnnController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,13 +19,19 @@ use App\Http\Controllers\AnnouncementController as AnnController;
 //    return $request->user();
 //});
 
+Route::post('register', 'Auth\RegisterController@register');
 
-Route::get('announcemens', 'AnnController@index');
+Route::post('login', 'Auth\LoginController@login');
 
-Route::get('announcementes/{id}', 'AnnController@show');
+Route::post('logout', 'Auth\LoginController@logout');
 
-Route::post('announcements/{id}', 'AnnController@store');
 
-Route::put('announcements/{id}', 'AnnController@update');
+Route::get('announcementes', 'AnnouncementController@index');
 
-Route::delete('announcement/{id}', 'AnnController@delete');
+Route::get('announcementes/{id}', 'AnnouncementController@show');
+
+Route::post('announcements/{id}', 'AnnouncementController@store');
+
+Route::put('announcements/{id}', 'AnnouncementController@update');
+
+Route::delete('announcement/{id}', 'AnnouncementController@delete');
