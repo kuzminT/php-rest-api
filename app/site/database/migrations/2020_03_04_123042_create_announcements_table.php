@@ -17,7 +17,7 @@ class CreateAnnouncementsTable extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->unsignedDecimal('amount', 8, 2);
+            $table->unsignedDecimal('price', 12, 2);
             $table->timestamps();
         });
     }
