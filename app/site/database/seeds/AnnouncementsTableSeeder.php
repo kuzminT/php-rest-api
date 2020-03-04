@@ -12,9 +12,8 @@ class AnnouncementsTableSeeder extends Seeder
      */
     public function run()
     {
-//        Announcement::truncate();
 
-        Announcement::query()->delete();
+//        Announcement::query()->delete();
 
         factory(App\Announcement::class, 50)->create();
 

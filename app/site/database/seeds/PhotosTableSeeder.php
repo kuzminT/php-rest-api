@@ -12,7 +12,7 @@ class PhotosTableSeeder extends Seeder
      */
     public function run()
     {
-        Photo::query()->delete();
+//        Photo::query()->delete();
 
         factory(Photo::class, 200 )->create();
     }

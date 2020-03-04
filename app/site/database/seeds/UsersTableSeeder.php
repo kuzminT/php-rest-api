@@ -12,7 +12,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        User::query()->delete();
+//        User::query()->delete();
 
         factory(User::class, 50)->create();
     }

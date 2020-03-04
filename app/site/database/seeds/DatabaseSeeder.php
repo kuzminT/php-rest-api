@@ -1,5 +1,8 @@
 <?php
 
+use App\Photo;
+use App\User;
+use App\Announcement;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,6 +14,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UsersTableSeeder::class);
+        Photo::query()->delete();
+        Announcement::query()->delete();
+        User::query()->delete();
+
+        $this->call(UsersTableSeeder::class);
+        $this->call(AnnouncementsTableSeeder::class);
+        $this->call(PhotosTableSeeder::class);
     }
 }
