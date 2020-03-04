@@ -27,9 +27,15 @@ libzip-dev \
  && pecl clear-cache \
  && apt-get -y autoremove
 
-#COPY ./etc/php.ini /usr/local/etc/php/conf.d/99-custom.ini
-#COPY xdebug.ini /usr/local/etc/php/conf.d/99-xdebug.ini
-ADD . /var/www
-RUN chown -R www-data:www-data /var/www/html/
-
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
+# Copy existing application directory contents
+#COPY . /var/www/html
+# Copy existing application directory permissions
+#COPY --chown=www:www . /var/www/html/
+# Change current user to www
+USER www
+
+
