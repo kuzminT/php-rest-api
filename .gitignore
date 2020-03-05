@@ -13,3 +13,4 @@ npm-debug.log
 yarn-error.log
 *.orig
 package-lock.json
+db_data/

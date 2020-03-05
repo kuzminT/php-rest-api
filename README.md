@@ -1,11 +1,13 @@
-Announcement - объявление 
+## Запуск приложения в докере
 
-После того, как контейнера докера будут запущены, выполнить:
+После того, как контейнеры докера будут запущены, выполнить:
+    
+    # Подтянуть все зависимости composer
+    docker-compose exec app composer install
     
     cp .env.example .env
     docker-compose exec app vim .env
     #Change the database configuration as below.
-    
     DB_CONNECTION=mysql
     DB_HOST=db
     DB_PORT=3306

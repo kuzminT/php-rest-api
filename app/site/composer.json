@@ -52,7 +52,7 @@
     "prefer-stable": true,
     "scripts": {
         "test": [
-            "vendor/bin/phpunit"
+            "APP_ENV=testing ./vendor/bin/phpunit -c phpunit.xml \"$@\""
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
