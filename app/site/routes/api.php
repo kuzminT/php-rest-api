@@ -30,7 +30,7 @@ Route::get('announcements', 'AnnouncementController@index');
 
 Route::get('announcements/{id}', 'AnnouncementController@show');
 
-Route::post('announcements/{id}', 'AnnouncementController@store');
+Route::post('announcements', 'AnnouncementController@store');
 
 Route::put('announcements/{id}', 'AnnouncementController@update');
 

@@ -32,8 +32,29 @@ class AnnouncementController extends Controller
 
     public function store(Request $request)
     {
+
+        $photos_input = $request->input('photos');
+
+//        $request->validate([
+//            'photos' => 'image|mimes:jpeg,png,jpg,gif|max:2048|nullable',
+//        ]);
+
         $ann = Ann::create($request->all());
-        return response()->json($ann, 201);
+
+        if ($photos_input) {
+            $photos = array_map(function($photo) {
+                return ['url' => $photo];
+            }, $photos_input);
+
+            $result_photos = $ann->photos()->createMany($photos);
+            $main_photo = ['main_photo' => ($result_photos->toArray())[0]['url'] ];
+        }
+
+        $result = array_merge($ann->toArray(), $main_photo);
+
+//        print_r(json_encode($result));
+
+        return response()->json($result, 201);
     }
 
     public function update(Request $request, Ann $ann)
