@@ -26,12 +26,12 @@ Route::post('login', 'Auth\LoginController@login');
 Route::post('logout', 'Auth\LoginController@logout');
 
 
-Route::get('announcementes', 'AnnouncementController@index');
+Route::get('announcements', 'AnnouncementController@index');
 
-Route::get('announcementes/{id}', 'AnnouncementController@show');
+Route::get('announcements/{id}', 'AnnouncementController@show');
 
 Route::post('announcements/{id}', 'AnnouncementController@store');
 
 Route::put('announcements/{id}', 'AnnouncementController@update');
 
-Route::delete('announcement/{id}', 'AnnouncementController@delete');
+Route::delete('announcements/{id}', 'AnnouncementController@delete');

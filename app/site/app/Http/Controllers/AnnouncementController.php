@@ -3,18 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Announcement as Ann;
+use App\Photo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AnnouncementController extends Controller
 {
     public function index()
     {
-        return Ann::all();
+
+        return DB::table('announcements as a')->leftJoin('photos as p',
+            function ($join) {
+                $join->on('a.id', '=', 'p.announcement_id')->on('p.created_at', '=',
+                    DB::raw('(select min(created_at) from photos where announcement_id = p.announcement_id)'));
+            })->select('a.id', 'a.title', 'a.price', 'p.url')->paginate(10);
     }
 
-    public function show(Ann $ann)
+    public function show(int $ann_id)
     {
-        return $ann;
+        $ann = DB::table('announcements as a')->where('a.id', $ann_id)->leftJoin('photos as p',
+            function ($join) {
+                $join->on('a.id', '=', 'p.announcement_id')->on('p.created_at', '=',
+                    DB::raw('(select min(created_at) from photos where announcement_id = p.announcement_id)'));
+            })->select('a.title', 'a.price', 'p.url')->first();
+
+        return json_encode($ann);
     }
 
     public function store(Request $request)
