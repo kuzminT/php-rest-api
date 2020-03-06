@@ -16,7 +16,7 @@ class AnnouncementController extends Controller
             function ($join) {
                 $join->on('a.id', '=', 'p.announcement_id')->on('p.created_at', '=',
                     DB::raw('(select min(created_at) from photos where announcement_id = p.announcement_id)'));
-            })->select('a.id', 'a.title', 'a.price', 'p.url')->paginate(10);
+            })->select('a.id', 'a.title', 'a.price', 'p.url as main_photo')->orderByDesc('a.created_at')->paginate(10);
     }
 
     public function show(int $ann_id)
@@ -25,11 +25,16 @@ class AnnouncementController extends Controller
             function ($join) {
                 $join->on('a.id', '=', 'p.announcement_id')->on('p.created_at', '=',
                     DB::raw('(select min(created_at) from photos where announcement_id = p.announcement_id)'));
-            })->select('a.title', 'a.price', 'p.url')->first();
+            })->select('a.title', 'a.price', 'p.url as main_photo')->first();
 
         return json_encode($ann);
     }
 
+    /**
+     * Create new Announcement with photos and return result
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
 
@@ -51,8 +56,6 @@ class AnnouncementController extends Controller
         }
 
         $result = array_merge($ann->toArray(), $main_photo);
-
-//        print_r(json_encode($result));
 
         return response()->json($result, 201);
     }

@@ -33,8 +33,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./db-extra/:/docker-entrypoint-initdb.d/
-      - ./db_data:/var/lib/mysql
+      - ./db-extra/:/docker-entrypoint-initdb.d/:rw
+      - ./db_data:/var/lib/mysql:rw
 
   app:
     build:
