@@ -4,30 +4,66 @@ namespace App\Http\Controllers;
 
 use App\Announcement as Ann;
 use App\Photo;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AnnouncementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $sortCol = $request->input('sort', '-created_at');
+        $sortDir = Str::startsWith($sortCol, '-') ? 'desc' : 'asc';
+        $sortCol = ltrim($sortCol, '-');
+
+        if (!in_array($sortCol, ['created_at', 'price'])) {
+            $sortCol = 'created_at';
+        }
 
         return DB::table('announcements as a')->leftJoin('photos as p',
             function ($join) {
                 $join->on('a.id', '=', 'p.announcement_id')->on('p.created_at', '=',
                     DB::raw('(select min(created_at) from photos where announcement_id = p.announcement_id)'));
-            })->select('a.id', 'a.title', 'a.price', 'p.url as main_photo')->orderByDesc('a.created_at')->paginate(10);
+            })->select('a.id', 'a.title', 'a.price', 'p.url as main_photo')->orderBy('a.' . $sortCol, $sortDir)->paginate(10);
     }
 
-    public function show(int $ann_id)
+    public function show(Request $request, int $ann_id)
     {
+
+        $fields = $request->input('fields', []);
+
+        $fields = array_intersect($fields, ['photos', 'description']);
+
+        $select = ['p.url as main_photo', 'a.title', 'a.price'];
+
+        if (in_array('description', $fields)) {
+            $select[] = 'a.description';
+        }
+
+
         $ann = DB::table('announcements as a')->where('a.id', $ann_id)->leftJoin('photos as p',
             function ($join) {
                 $join->on('a.id', '=', 'p.announcement_id')->on('p.created_at', '=',
                     DB::raw('(select min(created_at) from photos where announcement_id = p.announcement_id)'));
-            })->select('a.title', 'a.price', 'p.url as main_photo')->first();
+            })->select($select)->first();
 
-        return json_encode($ann);
+        if (!$ann) {
+            throw new ModelNotFoundException();
+        }
+
+        if (in_array('photos', $fields)) {
+            $photos = Photo::where('announcement_id', $ann_id)->select('url')->get()->toArray();
+
+            $photos = array_map(function ($p) {
+                return $p['url'];
+            }, $photos);
+
+
+            $ann->photos = $photos;
+        }
+
+        return json_encode(['data' => $ann]);
     }
 
     /**
@@ -40,19 +76,15 @@ class AnnouncementController extends Controller
 
         $photos_input = $request->input('photos');
 
-//        $request->validate([
-//            'photos' => 'image|mimes:jpeg,png,jpg,gif|max:2048|nullable',
-//        ]);
-
         $ann = Ann::create($request->all());
 
         if ($photos_input) {
-            $photos = array_map(function($photo) {
+            $photos = array_map(function ($photo) {
                 return ['url' => $photo];
             }, $photos_input);
 
             $result_photos = $ann->photos()->createMany($photos);
-            $main_photo = ['main_photo' => ($result_photos->toArray())[0]['url'] ];
+            $main_photo = ['main_photo' => ($result_photos->toArray())[0]['url']];
         }
 
         $result = array_merge($ann->toArray(), $main_photo);
