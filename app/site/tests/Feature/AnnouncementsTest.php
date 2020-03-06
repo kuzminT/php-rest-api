@@ -8,8 +8,14 @@ use Tests\TestCase;
 use \App\User;
 use \App\Announcement;
 
+//use Faker\Generator as Faker;
+//use Faker\Factory;
+
+
 class AnnouncementsTest extends TestCase
 {
+//    use WithFaker;
+
     /**
      * A basic feature test example.
      *
@@ -43,8 +49,63 @@ class AnnouncementsTest extends TestCase
         // @todo check return some id without one hardcoded number
     }
 
-    // @todo Add test to create Announcement with incorrect data
 
+    public function testsIncorrectDataStore()
+    {
+        $faker = \Faker\Factory::create();
+
+        $payload = [
+            'title' => $faker->sentence(100, '.'),
+//            'price' => 12.37,
+            'user_id' => 1,
+            'description' => 'Description of the announcement',
+            'photos' => ['https://lorempixel.com/640/480/cats/?28427', 'https://lorempixel.com/640/480/cats/?71114',
+                'https://lorempixel.com/640/480/cats/?45117'
+            ],
+        ];
+
+        $payload_without_title = $payload;
+
+        unset($payload_without_title['title']);
+
+        $response = $this->json('POST', '/api/announcements', $payload_without_title)
+            ->assertStatus(422);
+
+        $response->assertJsonFragment(['message' => 'The given data was invalid.',
+        ]);
+
+        $response->assertJson([
+            'errors' => [
+                'title' => [
+                    'The title field is required.',
+                ],
+                "price" => [
+                    "The price field is required."
+                ]
+            ]
+        ]);
+
+        $payload['description'] = $faker->text(2000);
+
+        $response = $this->json('POST', '/api/announcements', $payload)
+            ->assertStatus(422);
+
+        $response->assertJson([
+            'message' => 'The given data was invalid.',
+            'errors' => [
+                'title' => [
+                    "The title may not be greater than 200 characters.",
+                ],
+                "price" => [
+                    "The price field is required."
+                ],
+                'description' => [
+                    "The description may not be greater than 1000 characters.",
+                ],
+            ]
+        ]);
+
+    }
 
     public function testsGetAnnouncementWithoutFields()
     {
@@ -57,7 +118,8 @@ class AnnouncementsTest extends TestCase
 
     }
 
-    public function testsGetAnnouncementWithFields() {
+    public function testsGetAnnouncementWithFields()
+    {
 
         $id = \random_int(1, 50);
 

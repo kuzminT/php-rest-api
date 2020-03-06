@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Http\Requests\StoreAnnouncement;
 
 class AnnouncementController extends Controller
 {
@@ -55,9 +56,7 @@ class AnnouncementController extends Controller
         if (in_array('photos', $fields)) {
             $photos = Photo::where('announcement_id', $ann_id)->select('url')->get()->toArray();
 
-            $photos = array_map(function ($p) {
-                return $p['url'];
-            }, $photos);
+            $photos = array_map(function ($p) { return $p['url']; }, $photos);
 
 
             $ann->photos = $photos;
@@ -71,7 +70,7 @@ class AnnouncementController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(StoreAnnouncement $request)
     {
 
         $photos_input = $request->input('photos');
