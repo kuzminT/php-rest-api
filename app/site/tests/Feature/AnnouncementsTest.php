@@ -60,7 +60,7 @@ class AnnouncementsTest extends TestCase
             'user_id' => 1,
             'description' => 'Description of the announcement',
             'photos' => ['https://lorempixel.com/640/480/cats/?28427', 'https://lorempixel.com/640/480/cats/?71114',
-                'https://lorempixel.com/640/480/cats/?45117'
+                'https://lorempixel.com/640/480/cats/?45117',
             ],
         ];
 
@@ -87,6 +87,8 @@ class AnnouncementsTest extends TestCase
 
         $payload['description'] = $faker->text(2000);
 
+        $payload['photos'][] = 'https://lorempixel.com/640/480/cats/?123343';
+
         $response = $this->json('POST', '/api/announcements', $payload)
             ->assertStatus(422);
 
@@ -101,6 +103,9 @@ class AnnouncementsTest extends TestCase
                 ],
                 'description' => [
                     "The description may not be greater than 1000 characters.",
+                ],
+                'photos' => [
+                    "The photos may not have more than 3 items."
                 ],
             ]
         ]);
