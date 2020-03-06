@@ -15,7 +15,7 @@ class AnnouncementsTest extends TestCase
      *
      * @return void
      */
-    public function testsAnnouncementsAreCreateCorrectly()
+    public function testsAnnouncementsAreCreatedCorrectly()
     {
 
         $payload = [
@@ -44,6 +44,34 @@ class AnnouncementsTest extends TestCase
     }
 
     // @todo Add test to create Announcement with incorrect data
+
+
+    public function testsGetAnnouncementWithoutFields()
+    {
+        $response = $this->json('GET', '/api/announcements/1', [])
+            ->assertStatus(200);
+
+        $responseArr = json_decode($response->getContent(), true);
+        $this->assertArrayNotHasKey('description', $responseArr['data']);
+        $this->assertArrayNotHasKey('photos', $responseArr['data']);
+
+    }
+
+    public function testsGetAnnouncementWithFields() {
+
+        $id = \random_int(1, 50);
+
+        $response = $this->json('GET', "/api/announcements/{$id}",
+            ['fields' => ['description', 'photos']])
+            ->assertStatus(200);
+
+        $responseArr = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('description', $responseArr['data']);
+        $this->assertArrayHasKey('photos', $responseArr['data']);
+
+//        $response->dump();
+
+    }
 
     public function testsAnnouncementsAreListedCorrectly()
     {
@@ -79,10 +107,10 @@ class AnnouncementsTest extends TestCase
 //            ]);
 
         $response->assertJsonFragment([
-                    'title' => $ann_data[1]['title'],
-                    'price' => $ann_data[1]['price'],
-                    'main_photo' => $photo_data[1]['url'],
-                ]);
+            'title' => $ann_data[1]['title'],
+            'price' => $ann_data[1]['price'],
+            'main_photo' => $photo_data[1]['url'],
+        ]);
 
         $response->assertJsonFragment([
             'title' => $ann_data[0]['title'],
@@ -100,12 +128,26 @@ class AnnouncementsTest extends TestCase
 //            ], false
 //        );
 
-//        print_r($response);
-
 //            ->assertJsonStructure([
 //                '*' => ['id', 'price', 'title', 'created_at', 'main_photo'],
 //            ]);
 
     }
+
+    public function testsAnnouncementsSortedCorrectly()
+    {
+        $response = $this->json('GET', '/api/announcements', ['sort' => '-price'])
+            ->assertStatus(200);
+
+        $responseArr = json_decode($response->getContent(), true);
+
+        $this->assertLessThanOrEqual($responseArr['data'][0]['price'], $responseArr['data'][3]['price']);
+
+        $this->assertLessThanOrEqual($responseArr['data'][3]['price'], $responseArr['data'][6]['price']);
+
+        $response = $this->json('GET', '/api/announcements', ['sort' => 'created_at'])
+            ->assertStatus(200);
+    }
+
 
 }
